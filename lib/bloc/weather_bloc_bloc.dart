@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:weather/weather.dart';
@@ -11,12 +13,17 @@ class WeatherBlocBloc extends Bloc<WeatherBlocEvent, WeatherBlocState> {
     on<FetchWeather>((event, emit) async {
       emit(WeatherBlocLoading());
       try {
-        WeatherFactory wf =
-            WeatherFactory(API_KEY, language: Language.ENGLISH);
+        WeatherFactory wf = WeatherFactory(API_KEY, language: Language.ENGLISH);
 
         Position position = await Geolocator.getCurrentPosition();
         Weather weather = await wf.currentWeatherByLocation(
-            position.latitude, position.longitude);
+          event.position.latitude,
+          event.position.longitude,
+
+          ///position.latitude,
+          ///position.longitude,
+        );
+        log("WEATHER IN PROJETC - - - - - - ->: $weather");
         emit(WeatherBlocSuccess(weather: weather));
       } catch (e) {
         emit(WeatherBlocFailure());
