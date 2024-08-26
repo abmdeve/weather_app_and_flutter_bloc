@@ -1,19 +1,26 @@
-import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:weather/weather.dart';
 
+import '../data/my_data.dart';
 import 'weather_bloc_event.dart';
 import 'weather_bloc_state.dart';
 
-class Weather_blocBloc extends Bloc<Weather_blocEvent, Weather_blocState> {
-  Weather_blocBloc() : super(Weather_blocState().init());
+class WeatherBlocBloc extends Bloc<WeatherBlocEvent, WeatherBlocState> {
+  WeatherBlocBloc() : super(WeatherBlocInitial()) {
+    on<FetchWeather>((event, emit) async {
+      emit(WeatherBlocLoading());
+      try {
+        WeatherFactory wf =
+            WeatherFactory(API_KEY, language: Language.ENGLISH);
 
-  @override
-  Stream<Weather_blocState> mapEventToState(Weather_blocEvent event) async* {
-    if (event is InitEvent) {
-      yield await init();
-    }
-  }
-
-  Future<Weather_blocState> init() async {
-    return state.clone();
+        Position position = await Geolocator.getCurrentPosition();
+        Weather weather = await wf.currentWeatherByLocation(
+            position.latitude, position.longitude);
+        emit(WeatherBlocSuccess(weather: weather));
+      } catch (e) {
+        emit(WeatherBlocFailure());
+      }
+    });
   }
 }

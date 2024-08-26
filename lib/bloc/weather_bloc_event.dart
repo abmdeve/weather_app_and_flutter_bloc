@@ -1,3 +1,13 @@
-abstract class Weather_blocEvent {}
+import 'package:equatable/equatable.dart';
 
-class InitEvent extends Weather_blocEvent {}
+sealed class WeatherBlocEvent extends Equatable {
+  const WeatherBlocEvent();
+
+  @override
+  List<Object> get props => [];
+}
+
+
+class FetchWeather extends WeatherBlocEvent {
+
+}
